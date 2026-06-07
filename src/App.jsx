@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
+import { Calendar, MapPin, Users, ArrowDown, Stethoscope, Award, Globe } from 'lucide-react'
 import Stepper from './components/Stepper'
 import StepOne from './components/StepOne'
 import StepTwo from './components/StepTwo'
@@ -9,10 +10,11 @@ import SuccessScreen from './components/SuccessScreen'
 const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxlrFtQgg1W9cl08uk06bkOK89G9j-5vpZqXfJshOzi157WXT0WNKEzBt8cVrxJSSXV/exec'
 
 function App() {
-  const [currentStep, setCurrentStep] = useState(1)
+  const [currentStep, setCurrentStep] = useState(0)
   const [formData, setFormData] = useState({})
   const [regType, setRegType] = useState('standard')
   const [workshops, setWorkshops] = useState({ ws1: true, ws2: false })
+  const formRef = useRef(null)
 
   const handleSubmit = async (paymentMethod) => {
     const attendingWorkshops = Object.entries(workshops)
@@ -41,70 +43,209 @@ function App() {
     setCurrentStep(5)
   }
 
+  const scrollToForm = () => {
+    setCurrentStep(1)
+    setTimeout(() => {
+      formRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }, 100)
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a1628] via-[#0d2240] to-[#0a1f35] relative overflow-hidden">
+    <div className="min-h-screen bg-gray-50 font-sans">
 
-      {/* Background glows */}
-      <div className="absolute top-[-120px] right-[-120px] w-[500px] h-[500px] rounded-full"
-        style={{ background: 'radial-gradient(circle, rgba(0,188,165,0.12) 0%, transparent 70%)' }} />
-      <div className="absolute bottom-[-80px] left-[-80px] w-[400px] h-[400px] rounded-full"
-        style={{ background: 'radial-gradient(circle, rgba(20,100,180,0.1) 0%, transparent 70%)' }} />
+      {/* ── NAVBAR ── */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur border-b border-gray-100 px-6 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-[#0a1628] flex items-center justify-center">
+            <Stethoscope size={16} className="text-[#00bca5]" />
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-[#0a1628] leading-tight">KBTH · National Cardiothoracic Centre</p>
+            <p className="text-[10px] text-gray-400">Korle Bu Teaching Hospital</p>
+          </div>
+        </div>
+        <button
+          onClick={scrollToForm}
+          className="bg-[#0a1628] hover:bg-[#0d2240] text-white text-xs font-medium px-5 py-2 rounded-lg transition-all">
+          Register Now
+        </button>
+      </nav>
 
-      {/* Content */}
-      <div className="relative z-10 max-w-2xl mx-auto px-4 py-12">
+      {/* ── HERO ── */}
+      <div className="relative h-[92vh] flex items-center justify-center overflow-hidden">
+        {/* Background image */}
+        <img
+          src="https://images.unsplash.com/photo-1551190822-a9333d879b1f?w=1600&q=80"
+          alt="Surgical theatre"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        {/* Dark overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a1628]/80 via-[#0a1628]/70 to-[#0a1628]/90" />
 
-        <p className="text-[#00bca5] text-center text-xs tracking-widest uppercase mb-4">
-          Annual Surgical Conference 2026
-        </p>
-        <h1 className="font-display text-4xl text-center text-white font-semibold leading-tight mb-3">
-          Advancing Surgical Excellence<br />in West Africa
-        </h1>
-        <p className="text-center text-sm text-blue-200/60 mb-6">
-          National Cardiothoracic Centre · Korle Bu Teaching Hospital · Accra, Ghana
-        </p>
-        <div className="flex justify-center gap-8 text-sm text-blue-200/70 mb-8">
-          <span>📅 October 14–16, 2026</span>
-          <span>📍 KBTH Auditorium, Accra</span>
-          <span>👥 Limited seats</span>
+        {/* Hero content */}
+        <div className="relative z-10 text-center px-6 max-w-3xl mx-auto">
+          <div className="inline-block bg-[#00bca5]/20 border border-[#00bca5]/40 text-[#00bca5] text-xs font-medium tracking-widest uppercase px-4 py-1.5 rounded-full mb-6">
+            Annual Surgical Conference 2026
+          </div>
+          <h1 className="font-display text-5xl md:text-6xl text-white font-semibold leading-tight mb-4">
+            Advancing Surgical<br />Excellence in West Africa
+          </h1>
+          <p className="text-blue-100/70 text-base mb-8 max-w-xl mx-auto">
+            Join leading surgeons, cardiologists, and medical professionals from across the continent for three days of learning, collaboration, and innovation.
+          </p>
+
+          {/* Meta pills */}
+          <div className="flex flex-wrap justify-center gap-3 mb-10">
+            <div className="flex items-center gap-2 bg-white/10 backdrop-blur border border-white/20 text-white text-xs px-4 py-2 rounded-full">
+              <Calendar size={12} className="text-[#00bca5]" /> October 14–16, 2026
+            </div>
+            <div className="flex items-center gap-2 bg-white/10 backdrop-blur border border-white/20 text-white text-xs px-4 py-2 rounded-full">
+              <MapPin size={12} className="text-[#00bca5]" /> KBTH Auditorium, Accra
+            </div>
+            <div className="flex items-center gap-2 bg-white/10 backdrop-blur border border-white/20 text-white text-xs px-4 py-2 rounded-full">
+              <Users size={12} className="text-[#00bca5]" /> Limited seats available
+            </div>
+          </div>
+
+          <button
+            onClick={scrollToForm}
+            className="bg-[#00bca5] hover:bg-[#00d4bb] text-white font-medium px-10 py-4 rounded-xl text-sm transition-all hover:-translate-y-0.5 shadow-lg shadow-[#00bca5]/30">
+            Register Now
+          </button>
         </div>
 
-        {currentStep < 5 && <Stepper currentStep={currentStep} />}
-
-        {currentStep === 1 && (
-          <StepOne onNext={(data) => {
-            setFormData(data)
-            setCurrentStep(2)
-          }} />
-        )}
-        {currentStep === 2 && (
-          <StepTwo
-            onBack={() => setCurrentStep(1)}
-            onNext={(selected) => {
-              setRegType(selected)
-              setCurrentStep(3)
-            }}
-          />
-        )}
-        {currentStep === 3 && (
-          <StepThree
-            onBack={() => setCurrentStep(2)}
-            onNext={(selected) => {
-              setWorkshops(selected)
-              setCurrentStep(4)
-            }}
-          />
-        )}
-        {currentStep === 4 && (
-          <StepFour
-            onBack={() => setCurrentStep(3)}
-            onSubmit={handleSubmit}
-            regType={regType}
-            workshops={workshops}
-          />
-        )}
-        {currentStep === 5 && <SuccessScreen />}
-
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+          <ArrowDown size={20} className="text-white/40" />
+        </div>
       </div>
+
+      {/* ── HIGHLIGHTS ── */}
+      <div className="bg-white py-16 px-6">
+        <div className="max-w-4xl mx-auto">
+          <p className="text-center text-xs font-medium tracking-widest uppercase text-[#00bca5] mb-2">
+            Why Attend
+          </p>
+          <h2 className="font-display text-3xl text-center text-[#0a1628] font-semibold mb-10">
+            Conference Highlights
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="border border-gray-100 rounded-2xl p-6 hover:shadow-md transition-all">
+              <div className="w-10 h-10 rounded-xl bg-[#0a1628]/5 flex items-center justify-center mb-4">
+                <Stethoscope size={20} className="text-[#0a1628]" />
+              </div>
+              <h3 className="font-semibold text-[#0a1628] mb-2">Clinical Workshops</h3>
+              <p className="text-sm text-gray-500 leading-relaxed">
+                Hands-on pre-conference workshops covering minimally invasive techniques and thoracic oncology.
+              </p>
+            </div>
+
+            <div className="border border-gray-100 rounded-2xl p-6 hover:shadow-md transition-all">
+              <div className="w-10 h-10 rounded-xl bg-[#00bca5]/10 flex items-center justify-center mb-4">
+                <Award size={20} className="text-[#00bca5]" />
+              </div>
+              <h3 className="font-semibold text-[#0a1628] mb-2">Expert Presentations</h3>
+              <p className="text-sm text-gray-500 leading-relaxed">
+                Leading cardiothoracic surgeons and specialists presenting cutting-edge research and case studies.
+              </p>
+            </div>
+
+            <div className="border border-gray-100 rounded-2xl p-6 hover:shadow-md transition-all">
+              <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center mb-4">
+                <Globe size={20} className="text-blue-500" />
+              </div>
+              <h3 className="font-semibold text-[#0a1628] mb-2">Regional Networking</h3>
+              <p className="text-sm text-gray-500 leading-relaxed">
+                Connect with surgical professionals from across West Africa and build lasting professional relationships.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── REGISTRATION FORM ── */}
+      <div ref={formRef} className="bg-gray-50 py-16 px-6">
+        <div className="max-w-2xl mx-auto">
+          <p className="text-center text-xs font-medium tracking-widest uppercase text-[#00bca5] mb-2">
+            Secure Your Spot
+          </p>
+          <h2 className="font-display text-3xl text-center text-[#0a1628] font-semibold mb-2">
+            Conference Registration
+          </h2>
+          <p className="text-center text-sm text-gray-400 mb-8">
+            Complete the form below to register for the conference
+          </p>
+
+          {/* Form card */}
+          <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+
+            {currentStep === 0 && (
+              <div className="text-center py-6">
+                <div className="w-16 h-16 rounded-2xl bg-[#0a1628] flex items-center justify-center mx-auto mb-4">
+                  <Stethoscope size={28} className="text-[#00bca5]" />
+                </div>
+                <h3 className="font-display text-2xl text-[#0a1628] font-semibold mb-2">
+                  Ready to Register?
+                </h3>
+                <p className="text-sm text-gray-400 mb-6 max-w-sm mx-auto">
+                  The process takes about 3 minutes. You'll need your professional details and a payment method.
+                </p>
+                <button
+                  onClick={() => setCurrentStep(1)}
+                  className="bg-[#0a1628] hover:bg-[#0d2240] text-white text-sm font-medium px-10 py-3 rounded-xl transition-all">
+                  Start Registration →
+                </button>
+              </div>
+            )}
+
+            {currentStep > 0 && currentStep < 5 && (
+              <Stepper currentStep={currentStep} light />
+            )}
+
+            {currentStep === 1 && (
+              <StepOne onNext={(data) => { setFormData(data); setCurrentStep(2) }} light />
+            )}
+            {currentStep === 2 && (
+              <StepTwo
+                onBack={() => setCurrentStep(1)}
+                onNext={(selected) => { setRegType(selected); setCurrentStep(3) }}
+                light
+              />
+            )}
+            {currentStep === 3 && (
+              <StepThree
+                onBack={() => setCurrentStep(2)}
+                onNext={(selected) => { setWorkshops(selected); setCurrentStep(4) }}
+                light
+              />
+            )}
+            {currentStep === 4 && (
+              <StepFour
+                onBack={() => setCurrentStep(3)}
+                onSubmit={handleSubmit}
+                regType={regType}
+                workshops={workshops}
+                light
+              />
+            )}
+            {currentStep === 5 && <SuccessScreen />}
+
+          </div>
+        </div>
+      </div>
+
+      {/* ── FOOTER ── */}
+      <footer className="bg-[#0a1628] text-center py-8 px-6">
+        <div className="flex items-center justify-center gap-2 mb-2">
+          <div className="w-6 h-6 rounded bg-[#00bca5]/20 flex items-center justify-center">
+            <Stethoscope size={12} className="text-[#00bca5]" />
+          </div>
+          <span className="text-white text-sm font-medium">KBTH · National Cardiothoracic Centre</span>
+        </div>
+        <p className="text-blue-200/30 text-xs">Korle Bu Teaching Hospital · Accra, Ghana · © 2026</p>
+      </footer>
+
     </div>
   )
 }
