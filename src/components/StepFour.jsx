@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { usePaystackPayment } from 'react-paystack'
 import { Smartphone, Building2, Lock, CreditCard } from 'lucide-react'
 
 const PAYSTACK_PUBLIC_KEY = 'pk_live_54af97296f234e853a3acc85a113b67e38337520'
@@ -41,35 +40,30 @@ function StepFour({ onBack, onSubmit, regType, workshops, email }) {
   const conferenceAmount = conferenceAmountMap[regType] ?? 1000
   const grandTotal = conferenceAmount + workshopTotal
 
-  const paystackConfig = {
-    reference: `GSCVTS-${Date.now()}`,
-    email: email || 'participant@gscvts.org',
-    amount: grandTotal * 100, // Paystack expects pesewas (GHS × 100)
-    currency: 'GHS',
-    publicKey: PAYSTACK_PUBLIC_KEY,
-    channels: payMethod === 'momo' ? ['mobile_money'] : ['bank_transfer'],
-    metadata: {
-      custom_fields: [
-        { display_name: 'Registration Type', variable_name: 'reg_type', value: regLabel },
-        { display_name: 'Payment Method', variable_name: 'payment_method', value: payMethod },
-      ],
-    },
-  }
-
-  const initializePayment = usePaystackPayment(paystackConfig)
-
-  const handlePaystackSuccess = (response) => {
-    onSubmit(payMethod, response.reference)
-  }
-
-  const handlePaystackClose = () => {
-    // user closed popup — stay on this step
-  }
-
   const handleSubmit = () => {
     if (!agreed) { setError('Please agree to the terms before proceeding.'); return }
     setError('')
-    initializePayment({ onSuccess: handlePaystackSuccess, onClose: handlePaystackClose })
+
+    const handler = window.PaystackPop.setup({
+      key: PAYSTACK_PUBLIC_KEY,
+      email: email || 'participant@gscvts.org',
+      amount: grandTotal * 100, // pesewas
+      currency: 'GHS',
+      ref: `GSCVTS-${Date.now()}`,
+      channels: payMethod === 'momo' ? ['mobile_money'] : ['bank_transfer'],
+      metadata: {
+        custom_fields: [
+          { display_name: 'Registration Type', variable_name: 'reg_type', value: regLabel },
+          { display_name: 'Payment Method', variable_name: 'payment_method', value: payMethod },
+        ],
+      },
+      callback: (response) => {
+        onSubmit(payMethod, response.reference)
+      },
+      onClose: () => {},
+    })
+
+    handler.openIframe()
   }
 
   const inputClass = "bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-800 outline-none focus:border-[#00bca5] focus:bg-white transition-all w-full"
