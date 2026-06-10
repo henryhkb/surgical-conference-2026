@@ -1,6 +1,6 @@
 import { CheckCircle } from 'lucide-react'
 
-function SuccessScreen() {
+function SuccessScreen({ amountPaid }) {
   return (
     <div className="text-center py-8">
 
@@ -22,8 +22,8 @@ function SuccessScreen() {
             <p className="text-sm text-gray-800 font-medium">SC2026-00847</p>
           </div>
           <div>
-            <p className="text-[11px] text-gray-400 uppercase tracking-widest mb-1">Amount Paid</p>
-            <p className="text-sm text-gray-800 font-medium">₵850</p>
+            <p className="text-[11px] text-gray-400 uppercase tracking-widest mb-1">Amount Due</p>
+            <p className="text-sm text-gray-800 font-medium">{amountPaid}</p>
           </div>
           <div>
             <p className="text-[11px] text-gray-400 uppercase tracking-widest mb-1">Date</p>
@@ -33,7 +33,7 @@ function SuccessScreen() {
       </div>
 
       <p className="text-xs text-gray-300 mt-8">
-        National Cardiothoracic Centre · Korle Bu Teaching Hospital
+        Ghanaian Society of Cardiovascular and Thoracic Surgeons · www.gscvts.org
       </p>
 
     </div>

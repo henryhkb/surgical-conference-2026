@@ -12,11 +12,27 @@ const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxlrFtQgg1W9cl08uk06b
 function App() {
   const [currentStep, setCurrentStep] = useState(0)
   const [formData, setFormData] = useState({})
-  const [regType, setRegType] = useState('standard')
+  const [regType, setRegType] = useState('fellows')
   const [workshops, setWorkshops] = useState({ ws1: true, ws2: false })
+  const [amountPaid, setAmountPaid] = useState('')
   const formRef = useRef(null)
 
+  const conferenceAmountMap = { fellows: 1000, residents: 500, pharmacists: 300, allied: 200, international: null }
+
+  const computeTotal = () => {
+    const workshopTotal = (workshops.ws1 ? 500 : 0) + (workshops.ws2 ? 1000 : 0)
+    const conf = conferenceAmountMap[regType]
+    if (conf === null) {
+      const wsStr = workshopTotal > 0 ? ` + GHS ${workshopTotal.toLocaleString()} (workshops)` : ''
+      return `$100${wsStr}`
+    }
+    return `GHS ${(conf + workshopTotal).toLocaleString()}`
+  }
+
   const handleSubmit = async (paymentMethod) => {
+    const total = computeTotal()
+    setAmountPaid(total)
+
     const attendingWorkshops = Object.entries(workshops)
       .filter(([, val]) => val)
       .map(([key]) => key === 'ws1' ? 'Workshop 1' : 'Workshop 2')
@@ -24,8 +40,9 @@ function App() {
 
     const payload = {
       ...formData,
-      registrationType: regType === 'standard' ? 'Standard Registration' : 'Resident / Student Rate',
+      registrationType: regType,
       workshops: attendingWorkshops,
+      amountDue: total,
       paymentMethod,
     }
 
@@ -60,8 +77,8 @@ function App() {
             <Stethoscope size={16} className="text-[#00bca5]" />
           </div>
           <div>
-            <p className="text-xs font-semibold text-[#0a1628] leading-tight">KBTH · National Cardiothoracic Centre</p>
-            <p className="text-[10px] text-gray-400">Korle Bu Teaching Hospital</p>
+            <p className="text-xs font-semibold text-[#0a1628] leading-tight">GSCVTS</p>
+            <p className="text-[10px] text-gray-400">Ghanaian Society of Cardiovascular and Thoracic Surgeons</p>
           </div>
         </div>
         <button
@@ -87,23 +104,24 @@ function App() {
           <div className="inline-block bg-[#00bca5]/20 border border-[#00bca5]/40 text-[#00bca5] text-xs font-medium tracking-widest uppercase px-4 py-1.5 rounded-full mb-6">
             Annual Surgical Conference 2026
           </div>
-          <h1 className="font-display text-5xl md:text-6xl text-white font-semibold leading-tight mb-4">
-            Advancing Surgical<br />Excellence in West Africa
+          <h1 className="font-display text-4xl md:text-5xl text-white font-semibold leading-tight mb-4">
+            Capacity Building for Sustainable<br />
+            <span className="text-[#00bca5]">Cardiovascular</span> and Thoracic<br />Surgery Programmes in Ghana
           </h1>
           <p className="text-blue-100/70 text-base mb-8 max-w-xl mx-auto">
-            Join leading surgeons, cardiologists, and medical professionals from across the continent for three days of learning, collaboration, and innovation.
+            Join leading cardiovascular and thoracic surgeons from across Ghana for two days of learning, hands-on workshops, and professional collaboration.
           </p>
 
           {/* Meta pills */}
           <div className="flex flex-wrap justify-center gap-3 mb-10">
             <div className="flex items-center gap-2 bg-white/10 backdrop-blur border border-white/20 text-white text-xs px-4 py-2 rounded-full">
-              <Calendar size={12} className="text-[#00bca5]" /> October 14–16, 2026
+              <Calendar size={12} className="text-[#00bca5]" /> July 3–4, 2026
             </div>
             <div className="flex items-center gap-2 bg-white/10 backdrop-blur border border-white/20 text-white text-xs px-4 py-2 rounded-full">
-              <MapPin size={12} className="text-[#00bca5]" /> KBTH Auditorium, Accra
+              <MapPin size={12} className="text-[#00bca5]" /> Accra City Hotel
             </div>
             <div className="flex items-center gap-2 bg-white/10 backdrop-blur border border-white/20 text-white text-xs px-4 py-2 rounded-full">
-              <Users size={12} className="text-[#00bca5]" /> Limited seats available
+              <Users size={12} className="text-[#00bca5]" /> Registration closes June 26
             </div>
           </div>
 
@@ -135,9 +153,9 @@ function App() {
               <div className="w-10 h-10 rounded-xl bg-[#0a1628]/5 flex items-center justify-center mb-4">
                 <Stethoscope size={20} className="text-[#0a1628]" />
               </div>
-              <h3 className="font-semibold text-[#0a1628] mb-2">Clinical Workshops</h3>
+              <h3 className="font-semibold text-[#0a1628] mb-2">Pre-Conference Workshops</h3>
               <p className="text-sm text-gray-500 leading-relaxed">
-                Hands-on pre-conference workshops covering minimally invasive techniques and thoracic oncology.
+                Hands-on training on July 2nd at the Simulation Centre, UGMC — Vascular Anastomosis and VSD Repair techniques.
               </p>
             </div>
 
@@ -147,7 +165,7 @@ function App() {
               </div>
               <h3 className="font-semibold text-[#0a1628] mb-2">Expert Presentations</h3>
               <p className="text-sm text-gray-500 leading-relaxed">
-                Leading cardiothoracic surgeons and specialists presenting cutting-edge research and case studies.
+                Leading cardiovascular and thoracic surgeons presenting cutting-edge research, case studies, and surgical innovations.
               </p>
             </div>
 
@@ -155,9 +173,9 @@ function App() {
               <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center mb-4">
                 <Globe size={20} className="text-blue-500" />
               </div>
-              <h3 className="font-semibold text-[#0a1628] mb-2">Regional Networking</h3>
+              <h3 className="font-semibold text-[#0a1628] mb-2">National Networking</h3>
               <p className="text-sm text-gray-500 leading-relaxed">
-                Connect with surgical professionals from across West Africa and build lasting professional relationships.
+                Connect with fellows, residents, pharmacists, and allied health professionals across Ghana's surgical community.
               </p>
             </div>
           </div>
@@ -173,8 +191,11 @@ function App() {
           <h2 className="font-display text-3xl text-center text-[#0a1628] font-semibold mb-2">
             Conference Registration
           </h2>
-          <p className="text-center text-sm text-gray-400 mb-8">
+          <p className="text-center text-sm text-gray-400 mb-2">
             Complete the form below to register for the conference
+          </p>
+          <p className="text-center text-xs text-red-400 font-medium mb-8">
+            Registration closes: 26th June 2026
           </p>
 
           {/* Form card */}
@@ -229,7 +250,7 @@ function App() {
                 light
               />
             )}
-            {currentStep === 5 && <SuccessScreen />}
+            {currentStep === 5 && <SuccessScreen amountPaid={amountPaid} />}
 
           </div>
         </div>
@@ -241,9 +262,10 @@ function App() {
           <div className="w-6 h-6 rounded bg-[#00bca5]/20 flex items-center justify-center">
             <Stethoscope size={12} className="text-[#00bca5]" />
           </div>
-          <span className="text-white text-sm font-medium">KBTH · National Cardiothoracic Centre</span>
+          <span className="text-white text-sm font-medium">Ghanaian Society of Cardiovascular and Thoracic Surgeons</span>
         </div>
-        <p className="text-blue-200/30 text-xs">Korle Bu Teaching Hospital · Accra, Ghana · © 2026</p>
+        <p className="text-blue-200/50 text-xs mb-1">www.gscvts.org</p>
+        <p className="text-blue-200/30 text-xs">Accra, Ghana · © 2026</p>
       </footer>
 
     </div>

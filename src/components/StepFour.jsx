@@ -16,11 +16,32 @@ function StepFour({ onBack, onSubmit, regType, workshops }) {
   const [error, setError] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  const price = regType === 'standard' ? '₵850' : '₵450'
-  const regLabel = regType === 'standard' ? 'Standard Registration' : 'Resident / Student Rate'
-  const attendingWorkshops = Object.entries(workshops)
-    .filter(([, val]) => val)
-    .map(([key]) => key === 'ws1' ? 'Workshop 1' : 'Workshop 2')
+  const priceMap = {
+    fellows: 'GHS 1000',
+    residents: 'GHS 500',
+    pharmacists: 'GHS 300',
+    allied: 'GHS 200',
+    international: '$100',
+  }
+  const labelMap = {
+    fellows: 'Fellows / Members',
+    residents: 'Residents / Non-Member Physicians',
+    pharmacists: 'Pharmacists',
+    allied: 'Allied Health / Nurses',
+    international: 'International Participants',
+  }
+  const conferenceAmountMap = { fellows: 1000, residents: 500, pharmacists: 300, allied: 200, international: null }
+  const price = priceMap[regType] ?? 'GHS 1000'
+  const regLabel = labelMap[regType] ?? regType
+  const isInternational = regType === 'international'
+
+  const workshopDetails = [
+    { key: 'ws1', label: 'Workshop 1: Vascular Anastomosis', amount: 500 },
+    { key: 'ws2', label: 'Workshop 2: VSD Repair', amount: 1000 },
+  ]
+  const workshopTotal = workshopDetails.reduce((sum, w) => sum + (workshops[w.key] ? w.amount : 0), 0)
+  const conferenceAmount = conferenceAmountMap[regType]
+  const grandTotal = isInternational ? null : (conferenceAmount ?? 0) + workshopTotal
 
   const handleSubmit = () => {
     if (!agreed) { setError(true); return }
@@ -42,19 +63,40 @@ function StepFour({ onBack, onSubmit, regType, workshops }) {
         <p className="text-[11px] font-medium tracking-widest uppercase text-gray-400 mb-4">
           Order Summary
         </p>
-        <div className="flex justify-between items-center py-2">
-          <span className="text-sm text-gray-500">Registration type</span>
-          <span className="text-sm text-gray-800 font-medium">{regLabel}</span>
+
+        {/* Main Conference */}
+        <p className="text-[10px] font-medium uppercase tracking-widest text-gray-300 mb-1">Main Conference · July 3–4</p>
+        <div className="flex justify-between items-center py-2 border-b border-[#00bca5]/10">
+          <span className="text-sm text-gray-600">{regLabel}</span>
+          <span className="text-sm font-semibold text-gray-800">{price}</span>
         </div>
-        <div className="flex justify-between items-center py-2">
-          <span className="text-sm text-gray-500">Workshops</span>
-          <span className="text-sm text-gray-800 font-medium">
-            {attendingWorkshops.length > 0 ? attendingWorkshops.join(', ') : 'None'}
-          </span>
-        </div>
-        <div className="border-t border-[#00bca5]/15 mt-3 pt-4 flex justify-between items-center">
+
+        {/* Pre-Conference Workshops */}
+        <p className="text-[10px] font-medium uppercase tracking-widest text-gray-300 mt-4 mb-1">Pre-Conference Workshops · July 2</p>
+        {workshopDetails.map((w) => (
+          <div key={w.key} className="flex justify-between items-center py-1.5">
+            <span className="text-sm text-gray-600">{w.label}</span>
+            <span className={`text-sm font-medium ${workshops[w.key] ? 'text-gray-800' : 'text-gray-300'}`}>
+              {workshops[w.key] ? `GHS ${w.amount.toLocaleString()}` : '—'}
+            </span>
+          </div>
+        ))}
+
+        {/* Grand Total */}
+        <div className="border-t border-[#00bca5]/20 mt-4 pt-4 flex justify-between items-center">
           <span className="text-sm text-gray-800 font-medium">Total Due</span>
-          <span className="font-display text-3xl font-semibold text-[#00bca5]">{price}</span>
+          {grandTotal !== null ? (
+            <span className="font-display text-3xl font-semibold text-[#00bca5]">
+              GHS {grandTotal.toLocaleString()}
+            </span>
+          ) : (
+            <div className="text-right">
+              <span className="font-display text-2xl font-semibold text-[#00bca5]">$100</span>
+              {workshopTotal > 0 && (
+                <p className="text-xs text-gray-400">+ GHS {workshopTotal.toLocaleString()} (workshops)</p>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -86,16 +128,30 @@ function StepFour({ onBack, onSubmit, regType, workshops }) {
         </div>
 
         {payMethod === 'momo' && (
-          <div className="mt-4 flex flex-col gap-1">
-            <label className="text-[11px] font-medium tracking-widest uppercase text-gray-400">
-              MoMo Network
-            </label>
-            <select
-              value={momoNetwork}
-              onChange={(e) => setMomoNetwork(e.target.value)}
-              className={inputClass}>
-              {networks.map((n) => <option key={n}>{n}</option>)}
-            </select>
+          <div className="mt-4 bg-gray-50 border border-gray-100 rounded-xl px-5 py-4">
+            <p className="text-xs text-gray-400 uppercase tracking-widest mb-3 font-medium">Mobile Money Details</p>
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-1">
+                <label className="text-[11px] font-medium tracking-widest uppercase text-gray-400">Network</label>
+                <select
+                  value={momoNetwork}
+                  onChange={(e) => setMomoNetwork(e.target.value)}
+                  className={inputClass}>
+                  {networks.map((n) => <option key={n}>{n}</option>)}
+                </select>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-xs text-gray-400">Number</span>
+                <span className="text-xs text-gray-800 font-medium">0249123349</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-xs text-gray-400">Merchant No</span>
+                <span className="text-xs text-gray-800 font-medium">200566</span>
+              </div>
+              <p className="text-xs text-gray-400">
+                Please use your full name as payment reference and attach proof of payment.
+              </p>
+            </div>
           </div>
         )}
 
@@ -105,15 +161,11 @@ function StepFour({ onBack, onSubmit, regType, workshops }) {
             <div className="flex flex-col gap-2">
               <div className="flex justify-between">
                 <span className="text-xs text-gray-400">Bank</span>
-                <span className="text-xs text-gray-800 font-medium">Ghana Commercial Bank</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-xs text-gray-400">Account Name</span>
-                <span className="text-xs text-gray-800 font-medium">NCC Surgical Conference</span>
+                <span className="text-xs text-gray-800 font-medium">GCB – High Street</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-xs text-gray-400">Account Number</span>
-                <span className="text-xs text-gray-800 font-medium">1234567890</span>
+                <span className="text-xs text-gray-800 font-medium">1011101019883</span>
               </div>
               <p className="text-xs text-gray-400 mt-2">
                 Please use your full name as payment reference and attach proof of payment.
@@ -126,7 +178,7 @@ function StepFour({ onBack, onSubmit, regType, workshops }) {
       {/* Terms */}
       <div className="bg-gray-50 border border-gray-100 rounded-xl px-5 py-4 mb-5 text-xs text-gray-400 leading-relaxed">
         By completing this registration, you agree to the conference's cancellation policy.
-        Cancellations made before <span className="text-gray-700 font-medium">September 15, 2026</span> are
+        Cancellations made before <span className="text-gray-700 font-medium">June 20, 2026</span> are
         subject to a 20% administrative fee. No refunds will be granted after this date.
         Payment via card or MoMo will be processed securely through Paystack.
       </div>
