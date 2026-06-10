@@ -29,7 +29,7 @@ const regOptions = [
   {
     id: 'international',
     title: 'International Participants',
-    price: '$100',
+    price: 'GHS 1,171',
     note: 'Participants outside Ghana',
   },
 ]

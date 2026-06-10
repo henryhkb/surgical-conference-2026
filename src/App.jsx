@@ -17,19 +17,15 @@ function App() {
   const [amountPaid, setAmountPaid] = useState('')
   const formRef = useRef(null)
 
-  const conferenceAmountMap = { fellows: 1000, residents: 500, pharmacists: 300, allied: 200, international: null }
+  const conferenceAmountMap = { fellows: 1000, residents: 500, pharmacists: 300, allied: 200, international: 1171 }
 
   const computeTotal = () => {
     const workshopTotal = (workshops.ws1 ? 500 : 0) + (workshops.ws2 ? 1000 : 0)
-    const conf = conferenceAmountMap[regType]
-    if (conf === null) {
-      const wsStr = workshopTotal > 0 ? ` + GHS ${workshopTotal.toLocaleString()} (workshops)` : ''
-      return `$100${wsStr}`
-    }
+    const conf = conferenceAmountMap[regType] ?? 1000
     return `GHS ${(conf + workshopTotal).toLocaleString()}`
   }
 
-  const handleSubmit = async (paymentMethod) => {
+  const handleSubmit = async (paymentMethod, paystackReference) => {
     const total = computeTotal()
     setAmountPaid(total)
 
@@ -44,6 +40,7 @@ function App() {
       workshops: attendingWorkshops,
       amountDue: total,
       paymentMethod,
+      paystackReference: paystackReference ?? 'Bank Transfer',
     }
 
     try {
@@ -247,6 +244,7 @@ function App() {
                 onSubmit={handleSubmit}
                 regType={regType}
                 workshops={workshops}
+                email={formData.email}
                 light
               />
             )}
