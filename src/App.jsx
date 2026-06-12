@@ -264,7 +264,7 @@ function App() {
         </div>
         <p className="text-blue-200/50 text-xs mb-1">www.gscvts.org</p>
         <p className="text-blue-200/30 text-xs mb-3">Accra, Ghana · © 2026</p>
-        <p className="text-blue-200/20 text-xs">Developed by Henry Kofi Brandoh</p>
+        <p className="text-white text-sm font-medium">Developed by Henry Kofi Brandoh</p>
       </footer>
 
     </div>
